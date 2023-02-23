@@ -12,6 +12,10 @@ const mysqlConeccion = require('../bd/bd');
 router.get('/', (req, res)=>{
     res.send('hola esta funcionando');
 });
+
+router.get('/ariel', (req, res)=>{
+    res.send('hola ariel como estas ');
+});
 router.post('/buscar', (req, res)=>{
     const { dni, sexo } =req.body
     console.log(req.body);
