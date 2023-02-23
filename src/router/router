@@ -1,0 +1,28 @@
+const express= require('express');
+const router = express();
+// libreria que utilizaremos para la encriptacion de los password
+// const bcrypt= require('bcrypt');
+// // libreria que utilizaremos para la generacion de nuesrto token
+// const jwt= require('jsonwebtoken');
+//////archivo de coneccion
+const mysqlConeccion = require('../bd/bd');
+//////fin archivo de coneccion
+
+///////ruta raiz
+router.get('/', (req, res)=>{
+    res.send('hola esta funcionando');
+});
+router.post('/buscar', (req, res)=>{
+    const { dni, sexo } =req.body
+    console.log(req.body);
+            // let query=`INSERT INTO curso (nombre) VALUES ('${nombre}')`;
+            // mysqlConeccion.query(query, (err, registros)=>{
+            //     if(!err){
+            //         // res.send('Se inserto correctamente nuestro dato: '+nombre);
+            //     }else{
+            //         console.log(err)
+            //     }
+            // })
+      
+});
+module.exports = router;
