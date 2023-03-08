@@ -4,7 +4,7 @@ const mysqlConeccion= mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'proyecto_silicon'
+    database: 'vises_padron'
 });
 
 mysqlConeccion.connect(function(err){

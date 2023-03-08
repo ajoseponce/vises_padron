@@ -1,5 +1,7 @@
 const express= require('express');
 const router = express();
+const nodemailer = require("nodemailer");
+
 // libreria que utilizaremos para la encriptacion de los password
 // const bcrypt= require('bcrypt');
 // // libreria que utilizaremos para la generacion de nuesrto token
@@ -7,26 +9,111 @@ const router = express();
 //////archivo de coneccion
 const mysqlConeccion = require('../bd/bd');
 //////fin archivo de coneccion
-
+async function main(params) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    console.log(params)
+    let testAccount = await nodemailer.createTestAccount();
+  
+    
+    const transporter = nodemailer.createTransport({
+        host: 'c0580050.ferozo.com',
+        port: 465,
+        // pool: true,
+        secure: true,
+        auth: {
+            user: 'info@jpsistemas.com',
+            pass: 'Santino1412'
+        },
+        tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
+        },
+      });
+    transporter.verify().then(() => {
+        console.log("Listo para Mandar mails");
+      })
+      const info = await transporter.sendMail({
+        from: '"no-reply" <albertojoseponce@gmail.com>', // sender address
+        to: "albertojoseponce@gmail.com", // list of receivers
+        cc: "",
+        subject: "Buenas ✔", // Subject line
+        text: "Hello world?", // plain text body
+        html:
+          "El correo "+params.correo+" envio la siguente propuesta desde la app "+params.propuestas, // html body
+      });
+      console.log(info.messageId)
+   
+  }
 ///////ruta raiz
 router.get('/', (req, res)=>{
     res.send('hola esta funcionando');
 });
 
-router.get('/ariel', (req, res)=>{
-    res.send('hola ariel como estas ');
-});
 router.post('/buscar', (req, res)=>{
-    const { dni, sexo } =req.body
-    console.log(req.body);
-            // let query=`INSERT INTO curso (nombre) VALUES ('${nombre}')`;
-            // mysqlConeccion.query(query, (err, registros)=>{
-            //     if(!err){
-            //         // res.send('Se inserto correctamente nuestro dato: '+nombre);
-            //     }else{
-            //         console.log(err)
-            //     }
-            // })
+    const { dni  } =req.body
+    mysqlConeccion.query('select * from padron where dni=?',[dni], (err, registro)=>{
+        if(!err){
+            res.json({
+                status: true,
+                datos:registro
+            });
+        }else{
+            console.log(err)
+        }
+    })
+   
+      
       
 });
+router.get('/barrios', (req, res)=>{
+    mysqlConeccion.query('select * from barrios order by nombre asc', (err, registro)=>{
+        if(!err){
+            res.json(registro);
+        }else{
+            console.log(err)
+        }
+    })
+   
+});
+
+router.post('/propuestas', (req, res)=>{
+    const { correo , propuestas } =req.body
+    
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    // let testAccount = nodemailer.createTestAccount();
+  
+    // create reusable transporter object using the default SMTP transport
+    main({correo, propuestas}).catch(console.error);
+    // let mailOptions = nodemailer.createTransport({
+    //   host: "mail.vises.com.ar",
+    //   port: 587,
+    //   secure: false, // true for 465, false for other ports
+    //   auth: {
+    //     user: 'jponce@vises.com.ar', // generated ethereal user
+    //     pass: 'dcwM0Y6iJ', // generated ethereal password
+    //   },
+    // });
+
+    // transport.sendMail(mailOptions, (error, info) => {
+    //     if (error) {
+    //         return console.log(error);
+    //     }
+    //     console.log('Message sent: %s', info.messageId);
+    // });
+  
+   
+  
+    // console.log("Message sent: %s", info.messageId);
+    // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  
+    // // Preview only available when sending through an Ethereal account
+    // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  
+  
+//   main().catch(console.error);
+});
+
 module.exports = router;
